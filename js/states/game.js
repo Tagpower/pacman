@@ -13,55 +13,70 @@ pacman.prototype = {
 
    create: function() {
       var self = this;
-      //Create the background
-      
-      //self.background = game.add.tileSprite(0, 0, game.width, game.height, 'space');
-      //self.background.tint = (difficulty == OHGOD ? 0xff1111 : 0x3355ee);
 
       //Audio
       self.mute = false;
-      self.gameoversound = false;
-      self.introduction_sound = true;
 
       self.map = self.add.tilemap('map1');
       self.map.addTilesetImage('tileset merdique', 'tiles');
 
       self.layer = self.map.createLayer('layer1');
+      console.log(self.layer)
       self.layer.resizeWorld();
+
+      self.direction = Phaser.NONE; 
+      self.directions = []; //rename this
+
+      self.marker = new Phaser.Point();
+      self.turnPoint = new Phaser.Point();
 
       self.map.setCollision(1, true, self.layer);
 
       self.createPlayer();
 
       self.cursors = self.input.keyboard.createCursorKeys();
-
-      //self.move(Phaser.DOWN);
    },
 
    update: function() {
       var self = this;
-      self.physics.arcade.collide(self.player, self.layer);
       //Check collisions for everything
+      self.physics.arcade.collide(self.player, self.layer);
 
-      self.player.body.velocity.setTo(0);
+      //self.player.body.velocity.setTo(0);
+
+      self.marker.x = self.math.snapToFloor(Math.floor(self.player.x), TILE_SIZE) / TILE_SIZE;
+      self.marker.y = self.math.snapToFloor(Math.floor(self.player.y), TILE_SIZE) / TILE_SIZE;
+
+      var i = self.layer.index;
+
+      self.directions[Phaser.LEFT] = self.map.getTileLeft(i, self.marker.x, self.marker.y);
+      self.directions[Phaser.RIGHT] = self.map.getTileRight(i, self.marker.x, self.marker.y);
+      self.directions[Phaser.UP] = self.map.getTileAbove(i, self.marker.x, self.marker.y);
+      self.directions[Phaser.DOWN] = self.map.getTileBelow(i, self.marker.x, self.marker.y);
+
 
       if (self.cursors.up.isDown) {
-         self.player.animations.play('up');
-         self.player.body.velocity.y = -50;
+         self.checkDirection(Phaser.UP);
       } else if (self.cursors.down.isDown) {
-         self.player.animations.play('down');
-         self.player.body.velocity.y = 50;
+         self.checkDirection(Phaser.DOWN);
       } else if (self.cursors.left.isDown) {
-         self.player.animations.play('left');
-         self.player.body.velocity.x = -50;
+         self.checkDirection(Phaser.LEFT);
       } else if (self.cursors.right.isDown) {
-         self.player.animations.play('right');
-         self.player.body.velocity.x = 50;
+         self.checkDirection(Phaser.RIGHT);
       }
+
+      if (self.math.fuzzyEqual(self.player.x, self.turnPoint.x, 2) && self.math.fuzzyEqual(self.player.y, self.turnPoint.y, 2)) {
+         self.player.x = self.turnPoint.x;
+         self.player.y = self.turnPoint.y;
+
+         self.player.body.reset(self.turnPoint.x, self.turnPoint.y);
+         self.move(self.direction);
+         self.direction = Phaser.NONE;
+      }
+
 
    },
 
-   // {{{ CREATEPLAYER
    createPlayer: function() {
       var self = this;
       self.player = self.game.add.sprite(24,24,'player');
@@ -79,15 +94,49 @@ pacman.prototype = {
       self.player.animations.add('down', [9,10,11,10],12,true);
    },
 
+   checkDirection: function(dir) {
+      var self = this;
+      if (self.direction === dir) { //FIXME
+         self.move(dir);
+      } else {
+         self.direction = dir;
+         self.turnPoint.x = (self.directions[dir].x * TILE_SIZE) + (TILE_SIZE / 2);
+         self.turnPoint.y = (self.directions[dir].y * TILE_SIZE) + (TILE_SIZE / 2);
+         console.log(self.turnPoint);
+      }
+   },
+
+   move: function(dir) {
+      var self = this;
+
+      switch (dir) {
+         case Phaser.UP:
+            self.player.animations.play('up');
+            self.player.body.velocity.y = -75;
+            break;
+         case Phaser.DOWN:
+            self.player.animations.play('down');
+            self.player.body.velocity.y = 75;
+            break;
+         case Phaser.LEFT:
+            self.player.animations.play('left');
+            self.player.body.velocity.x = -75;
+            break;
+         case Phaser.RIGHT:
+            self.player.animations.play('right');
+            self.player.body.velocity.x = 75;
+            break;
+         default:
+            break;
+      }
+   },
+
    // Load a level and its enemies
    loadLevel: function(lvl) {
       var self = this;
       
-
    },
-   // }}}
 
-   // {{{ PAUSEGAME
    pauseGame: function() {
       var self = this;
       if (self.lives > 0) {
@@ -106,14 +155,12 @@ pacman.prototype = {
          }
       }   
    },
-   // }}}
 
    // When the player is hit by enemy
-   playerHit: function(player, shot) {
+   playerHit: function(player, enemy) {
       var self = this;
       
    },
-   // }}}
 
   
    gameOver: function() {
@@ -122,27 +169,20 @@ pacman.prototype = {
       //this.game.state.start("GameOver");
    },
 
-   // {{{ MUTEGAME
    muteGame: function() {
       var self = this;
       if (!self.mute) {
          self.mute = true;
          self.music.pause()
-         self.music_bonus.pause();
       } else {
          self.mute = false;
-         if (self.in_bonus_level) {
-            self.music_bonus.resume();
-         } else {
-            self.music.resume();
-         }
+         self.music.resume();
       }
 
       console.log('mute is ' + self.mute);
       self.mute_wait = 30;
    },
 
-   // {{{ RESTART
    // Restarts the game from zero
    restart: function(level) {
       var self = this;

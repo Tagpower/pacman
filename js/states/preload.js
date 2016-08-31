@@ -1,5 +1,5 @@
 //Constants
-
+var TILE_SIZE = 16;
 
 
 // State
