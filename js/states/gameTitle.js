@@ -12,10 +12,11 @@ gameTitle.prototype = {
       console.log("-*- Launch the game -*-");
 
 
-      self.music = game.add.audio('title');
-      self.music.loop = true;
-      self.music.volume = 1;
-      self.music.play();
+      //self.music = game.add.audio('title');
+      //self.music.loop = true;
+      //self.music.volume = 1;
+      //self.music.play();
+      self.launch(0);
    },
 
    update: function() {
@@ -27,7 +28,7 @@ gameTitle.prototype = {
       var config = {
          is_boss: false,
       };
-      self.music.stop();
+      //self.music.stop();
       this.game.state.start("Game", true, false, config);
    }
 

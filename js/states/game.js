@@ -23,38 +23,60 @@ pacman.prototype = {
       self.gameoversound = false;
       self.introduction_sound = true;
 
-      //Create the player's ship
-      console.log("\tCreating player...");
+      self.map = self.add.tilemap('map1');
+      self.map.addTilesetImage('tileset merdique', 'tiles');
+
+      self.layer = self.map.createLayer('layer1');
+      self.layer.resizeWorld();
+
+      self.map.setCollision(1, true, self.layer);
+
       self.createPlayer();
-      console.log("\t-*- Player created -*-");
-      self.game.camera.follow(self.player); 
+
+      self.cursors = self.input.keyboard.createCursorKeys();
+
+      //self.move(Phaser.DOWN);
    },
 
    update: function() {
       var self = this;
-      
+      self.physics.arcade.collide(self.player, self.layer);
       //Check collisions for everything
+
+      self.player.body.velocity.setTo(0);
+
+      if (self.cursors.up.isDown) {
+         self.player.animations.play('up');
+         self.player.body.velocity.y = -50;
+      } else if (self.cursors.down.isDown) {
+         self.player.animations.play('down');
+         self.player.body.velocity.y = 50;
+      } else if (self.cursors.left.isDown) {
+         self.player.animations.play('left');
+         self.player.body.velocity.x = -50;
+      } else if (self.cursors.right.isDown) {
+         self.player.animations.play('right');
+         self.player.body.velocity.x = 50;
+      }
+
    },
 
    // {{{ CREATEPLAYER
    createPlayer: function() {
       var self = this;
-      self.player = self.game.add.sprite(self.init_x,self.init_y,'ship');
+      self.player = self.game.add.sprite(24,24,'player');
       self.game.physics.arcade.enable(self.player);
 
       self.player.body.collideWorldBounds = true;
       self.player.body.immovable = false;
       self.lostAlife = false;
-      self.touched = false;
 
-      self.player.anchor.setTo(0.5,0.5);
+      self.player.anchor.setTo(0.5);
 
-      self.player.animations.add('idle', [0,1],6,true);
-      self.player.animations.add('left', [2,3],6,true);
-      self.player.animations.add('right', [4,5],6,true);
-      self.player.animations.add('dead', [6],6,true);
-
-      self.weapon = self.weapons[self.power-1];
+      self.player.animations.add('right', [0,1,2,1],12,true);
+      self.player.animations.add('up', [3,4,5,4],12,true);
+      self.player.animations.add('left', [6,7,8,7],12,true);
+      self.player.animations.add('down', [9,10,11,10],12,true);
    },
 
    // Load a level and its enemies
