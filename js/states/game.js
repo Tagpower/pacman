@@ -96,13 +96,13 @@ pacman.prototype = {
 
    checkDirection: function(dir) {
       var self = this;
+      console.log(dir);
       if (self.direction === dir) { //FIXME
          self.move(dir);
       } else {
          self.direction = dir;
          self.turnPoint.x = (self.directions[dir].x * TILE_SIZE) + (TILE_SIZE / 2);
          self.turnPoint.y = (self.directions[dir].y * TILE_SIZE) + (TILE_SIZE / 2);
-         console.log(self.turnPoint);
       }
    },
 
@@ -126,6 +126,9 @@ pacman.prototype = {
             self.player.animations.play('right');
             self.player.body.velocity.x = 75;
             break;
+         case Phaser.NONE:
+            self.player.animations.stop();
+            self.player.body.velocity.setTo(0);
          default:
             break;
       }
