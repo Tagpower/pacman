@@ -16,6 +16,11 @@ pacman.prototype = {
 
       //Audio
       self.mute = false;
+      self.score = 0;
+
+      self.text_score = self.game.add.text(self.game.world.width-40, 16, '', {font: '16px Minecraftia', fill: '#ffffff', align: 'right'});
+      self.text_score.fixedToCamera = true;
+      self.text_score.anchor.setTo(0.5);
 
       self.map = self.add.tilemap('map1');
       self.map.addTilesetImage('tileset merdique', 'tiles');
@@ -35,13 +40,19 @@ pacman.prototype = {
       self.createPlayer();
 
       self.cursors = self.input.keyboard.createCursorKeys();
+
+      self.dots = this.add.physicsGroup();
+      self.map.createFromTiles(2, null, 'dot', self.layer, self.dots);
+
+      self.dots.setAll('x', 7, false, false, 1);
+      self.dots.setAll('y', 7, false, false, 1);
    },
 
    update: function() {
       var self = this;
       //Check collisions for everything
       self.physics.arcade.collide(self.player, self.layer);
-
+      self.physics.arcade.overlap(self.player, self.dots, self.eatDot, null, this);
       //self.player.body.velocity.setTo(0);
 
       self.marker.x = self.math.snapToFloor(Math.floor(self.player.x), TILE_SIZE) / TILE_SIZE;
@@ -53,7 +64,6 @@ pacman.prototype = {
       self.directions[Phaser.RIGHT] = self.map.getTileRight(i, self.marker.x, self.marker.y);
       self.directions[Phaser.UP] = self.map.getTileAbove(i, self.marker.x, self.marker.y);
       self.directions[Phaser.DOWN] = self.map.getTileBelow(i, self.marker.x, self.marker.y);
-
 
       if (self.cursors.up.isDown) {
          self.checkDirection(Phaser.UP);
@@ -74,6 +84,7 @@ pacman.prototype = {
          self.direction = Phaser.NONE;
       }
 
+      self.text_score.text = self.score;
 
    },
 
@@ -132,6 +143,17 @@ pacman.prototype = {
          default:
             break;
       }
+   },
+
+   eatDot: function (pacman, dot) {
+      var self = this;
+      dot.kill();
+      self.score += 10;
+
+      if (self.dots.total === 0) {
+         self.dots.callAll('revive');
+      }
+
    },
 
    // Load a level and its enemies

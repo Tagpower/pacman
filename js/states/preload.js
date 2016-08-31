@@ -12,6 +12,8 @@ preload.prototype = {
       //Images
 		//this.game.load.image('space', 'assets/bg.png');
 
+		this.game.load.image('dot', 'assets/dot.png', 2, 2);
+
 		//Spritesheets
 		this.game.load.spritesheet('tiles', 'assets/tiles_WIP.png', 16, 16);
 		this.game.load.spritesheet('player', 'assets/player.png', 16, 16);
@@ -25,8 +27,8 @@ preload.prototype = {
 
 		this.game.load.tilemap('map1', 'maps/map1.json', null, Phaser.Tilemap.TILED_JSON);
 
-		//var loadingBar = this.game.add.sprite(game.world.centerX, 400, "loading");
-		//this.load.setPreloadSprite(loadingBar, 0);
+		var loadingBar = this.game.add.sprite(game.world.centerX, game.world.centerY, "loading");
+		this.load.setPreloadSprite(loadingBar, 0);
    },
    create: function() {
       console.log("-*- Preloaded -*-");
