@@ -1,9 +1,11 @@
 ﻿=====TODO LIST=====
 - ABSOLUMENT TOUT
+- Les ennemis et le pathfinding
 
 =====BUGS=====
 
 ---MAJEURS---
-
+- Pacman ralentit parfois
 
 ---MINEURS---
+- Déplacement en crabe

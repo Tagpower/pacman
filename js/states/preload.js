@@ -1,6 +1,6 @@
 //Constants
 var TILE_SIZE = 16;
-
+var easystar = new EasyStar.js();
 
 // State
 var preload = function(game) {
@@ -26,12 +26,14 @@ preload.prototype = {
 
 
 		this.game.load.tilemap('map1', 'maps/map1.json', null, Phaser.Tilemap.TILED_JSON);
+		this.game.load.tilemap('map2', 'maps/map2.json', null, Phaser.Tilemap.TILED_JSON);
 
 		var loadingBar = this.game.add.sprite(game.world.centerX, game.world.centerY, "loading");
 		this.load.setPreloadSprite(loadingBar, 0);
    },
    create: function() {
       console.log("-*- Preloaded -*-");
+      console.log(easystar);
       this.game.state.start("GameTitle");
    }
 }

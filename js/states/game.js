@@ -22,12 +22,33 @@ pacman.prototype = {
       self.text_score.fixedToCamera = true;
       self.text_score.anchor.setTo(0.5);
 
-      self.map = self.add.tilemap('map1');
-      self.map.addTilesetImage('tileset merdique', 'tiles');
+      self.map = self.add.tilemap('map2');
+      //self.map.addTilesetImage('tileset merdique', 'tiles');
+      self.map.addTilesetImage('tiles_WIP', 'tiles');
 
       self.layer = self.map.createLayer('layer1');
       console.log(self.layer)
       self.layer.resizeWorld();
+
+      //Setting up EasyStar data
+      var grid = [];
+      for (var i = 0 ; i < self.layer.layer.data.length; i++) {
+         grid.push([]);
+         for (var j = 0 ; j < self.layer.layer.data[i].length; j++) {
+             grid[i].push(self.layer.layer.data[i][j].index);
+          }
+      }
+      easystar.setGrid(grid);
+      easystar.setAcceptableTiles([2]);
+      easystar.findPath(1,1,7,7, function(path) {
+         if (path === null) {
+            console.log("Pas de chemin");
+         } else {
+            console.log(path);
+            console.log(path.length -1);
+         }
+      });
+      easystar.calculate();
 
       self.direction = Phaser.NONE; 
       self.directions = []; //rename this
@@ -107,7 +128,6 @@ pacman.prototype = {
 
    checkDirection: function(dir) {
       var self = this;
-      console.log(dir);
       if (self.direction === dir) { //FIXME
          self.move(dir);
       } else {
