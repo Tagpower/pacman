@@ -22,9 +22,9 @@ pacman.prototype = {
       self.text_score.fixedToCamera = true;
       self.text_score.anchor.setTo(0.5);
 
-      self.map = self.add.tilemap('map2');
-      //self.map.addTilesetImage('tileset merdique', 'tiles');
-      self.map.addTilesetImage('tiles_WIP', 'tiles');
+      self.map = self.add.tilemap('map1');
+      self.map.addTilesetImage('tileset merdique', 'tiles');
+      //self.map.addTilesetImage('tiles_WIP', 'tiles');
 
       self.layer = self.map.createLayer('layer1');
       console.log(self.layer)
