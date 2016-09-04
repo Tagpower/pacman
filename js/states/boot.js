@@ -12,9 +12,7 @@ boot.prototype = {
 
       this.game.renderer.clearBeforeRender = false;
       this.game.renderer.roundPixels = false;
-      this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-      this.scale.pageAlignHorizontally = true;
-      this.scale.pageAlignVertically = true;
+      this.scale.scaleMode = Phaser.ScaleManager.NO_SCALE;
 
       Phaser.Canvas.setImageRenderingCrisp(this.game.canvas);
 
