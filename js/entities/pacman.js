@@ -10,7 +10,7 @@ var Pac = function(state, x, y) {
    this.body.isCircle = true; // MAGIC !!!
    this.anchor.setTo(0.5);
 
-   this.speed = 5;
+   this.speed = 75;
    this.state = state;
    this.state.turnPoint.x = x;
    this.state.turnPoint.y = y;
