@@ -18,6 +18,7 @@ preload.prototype = {
 		this.game.load.spritesheet('tiles', 'assets/tiles_WIP.png', 16, 16);
 		this.game.load.spritesheet('tiles2', 'assets/tiles2_WIP.png', 16, 16);
 		this.game.load.spritesheet('player', 'assets/player.png', 16, 16);
+		this.game.load.spritesheet('enemy', 'assets/enemy.png', 16, 16);
 
 		//Music
 		//this.game.load.audio('ambient', ['assets/audio/e1m1.mp3']);

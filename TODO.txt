@@ -5,8 +5,6 @@
 =====BUGS=====
 
 ---MAJEURS---
-- Pacman ralentit parfois
+
 
 ---MINEURS---
-- Déplacement en crabe
-- Déplacement en diagonale non autorisé

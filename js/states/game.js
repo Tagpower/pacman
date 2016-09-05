@@ -22,13 +22,13 @@ pacman.prototype = {
       self.text_score.fixedToCamera = true;
       self.text_score.anchor.setTo(0.5);
 
-      self.map = self.add.tilemap('map1');
-      self.map.addTilesetImage('tileset merdique', 'tiles');
-      //self.map.addTilesetImage('tiles_WIP', 'tiles');
+      self.map = self.add.tilemap('map3');
+      //self.map.addTilesetImage('tileset merdique', 'tiles');
+      self.map.addTilesetImage('tiles2_WIP', 'tiles2');
 
       self.layer = self.map.createLayer('layer1');
       self.layer.resizeWorld();
-      self.safeTile = 2;
+      self.safeTile = [1,2];
 
       //Setting up EasyStar data
       var grid = [];
@@ -39,28 +39,29 @@ pacman.prototype = {
          }
       }
       easystar.setGrid(grid);
-      easystar.setAcceptableTiles([2]);
+      easystar.setAcceptableTiles([1,2]);
       easystar.calculate();
 
       self.turnPoint = new Phaser.Point();
       self.marker = new Phaser.Point();
 
-      self.directions = [ null, null, null, null, null ];
-      self.opposites = [ Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, Phaser.DOWN, Phaser.UP ]; 
-
-      self.map.setCollision(1, true, self.layer);
+      self.map.setCollision([3,4], true, self.layer);
 
       self.player = new Pac(this, 24, 24);
+
+      self.enemies = this.add.group(this, null, 'enemies', false, true, Phaser.Physics.ARCADE);
+      self.enemies.add(new Enemy(this, 120, 24));
 
       self.cursors = self.input.keyboard.createCursorKeys();
 
       self.dots = this.add.physicsGroup();
-      self.map.createFromTiles(2, null, 'dot', self.layer, self.dots);
+      self.map.createFromTiles([1,2], null, 'dot', self.layer, self.dots);
 
       self.dots.setAll('x', 7, false, false, 1);
       self.dots.setAll('y', 7, false, false, 1);
 
       self.player.move(Phaser.RIGHT);
+      console.log(self.enemies);
    },
 
    update: function() {
@@ -68,23 +69,9 @@ pacman.prototype = {
       //Check collisions for everything
       //self.player.body.velocity.setTo(0);
 
-      this.checkNearTiles();
+      this.player.checkNearTiles();
 
       self.text_score.text = self.score;
-   },
-
-   checkNearTiles: function() {
-      var self = this;
-      self.marker.x = self.math.snapToFloor(Math.floor(self.player.x), TILE_SIZE) / TILE_SIZE;
-      self.marker.y = self.math.snapToFloor(Math.floor(self.player.y), TILE_SIZE) / TILE_SIZE;
-
-      var i = self.layer.index;
-
-      self.directions[Phaser.LEFT] = self.map.getTileLeft(i, self.marker.x, self.marker.y);
-      self.directions[Phaser.RIGHT] = self.map.getTileRight(i, self.marker.x, self.marker.y);
-      self.directions[Phaser.UP] = self.map.getTileAbove(i, self.marker.x, self.marker.y);
-      self.directions[Phaser.DOWN] = self.map.getTileBelow(i, self.marker.x, self.marker.y);
-      self.directions[Phaser.NONE] = new Phaser.Point(1,1);
    },
 
    eatDot: function (pacman, dot) {
@@ -126,7 +113,7 @@ pacman.prototype = {
    // When the player is hit by enemy
    playerHit: function(player, enemy) {
       var self = this;
-
+      console.log("qijhfbazekbfkqbf");
    },
 
 
