@@ -27,7 +27,11 @@
          "spacing":0,
          "tilecount":4,
          "tileheight":16,
-         "tilewidth":16
+         "tilewidth":16,
+         "tileproperties": {
+            "0": {"walkable": "false"},
+            "1": {"walkable": "false"}
+         }
         }],
  "tilewidth":16,
  "version":1,

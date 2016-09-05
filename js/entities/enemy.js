@@ -1,5 +1,5 @@
-var Pac = function(state, x, y) {
-   Phaser.Sprite.call(this, state.game, x, y, 'player');
+var Enemy = function(state, x, y) {
+   Phaser.Sprite.call(this, state.game, x, y, 'enemy');
 
    this.texture.baseTexture.scaleMode = PIXI.scaleModes.NEAREST;
    this.game.physics.arcade.enable(this);
@@ -10,29 +10,28 @@ var Pac = function(state, x, y) {
    this.body.isCircle = true; // MAGIC !!!
    this.anchor.setTo(0.5);
 
-   this.speed = 75;
+   this.speed = 60;
    this.state = state;
    this.turnPoint = new Phaser.Point(x,y);
    this.marker = new Phaser.Point();
    this.current = Phaser.NONE;
-   this.turning = Phaser.NONE;
+   this.turning = Phaser.NONE;  
 
    this.directions = [ null, null, null, null, null ];
    this.opposites = [ Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, Phaser.DOWN, Phaser.UP ]; 
 
    this.threshold = 3;
 
-   this.animations.add('chomp', [0,1,2,1],   12,true);
-   this.animations.play('chomp');
+   this.animations.add('move', [0,1],6,true);
+   this.animations.play('move');
 }
 
-Pac.prototype = Object.create(Phaser.Sprite.prototype);
-Pac.prototype.constructor = Pac;
+Enemy.prototype = Object.create(Phaser.Sprite.prototype);
+Enemy.prototype.constructor = Enemy;
 
-Pac.prototype.update = function() {
+Enemy.prototype.update = function() {
    this.game.physics.arcade.collide(this, this.state.layer);
-   this.game.physics.arcade.overlap(this, this.state.dots, this.state.eatDot, null, this.state);
-   this.game.physics.arcade.overlap(this, this.state.enemies, this.state.playerHit, null, this.state);
+   this.game.physics.arcade.overlap(this, this.state.player, this.state.playerHit, null, this.state);
 
    if (this.state.cursors.up.isDown && this.current !== Phaser.UP) {
       this.checkDirection(Phaser.UP);
@@ -52,20 +51,7 @@ Pac.prototype.update = function() {
    }
 }
 
-Pac.prototype.checkNearTiles = function() {
-   this.marker.x = this.state.math.snapToFloor(Math.floor(this.x), TILE_SIZE) / TILE_SIZE;
-   this.marker.y = this.state.math.snapToFloor(Math.floor(this.y), TILE_SIZE) / TILE_SIZE;
-
-   var i = this.state.layer.index;
-
-   this.directions[Phaser.LEFT] = this.state.map.getTileLeft(i, this.marker.x, this.marker.y);
-   this.directions[Phaser.RIGHT] = this.state.map.getTileRight(i, this.marker.x, this.marker.y);
-   this.directions[Phaser.UP] = this.state.map.getTileAbove(i, this.marker.x, this.marker.y);
-   this.directions[Phaser.DOWN] = this.state.map.getTileBelow(i, this.marker.x, this.marker.y);
-   this.directions[Phaser.NONE] = new Phaser.Point(1,1);
-}
-
-Pac.prototype.checkDirection = function(turnTo) {
+Enemy.prototype.checkDirection = function(turnTo) {
    if (this.turning === turnTo || this.directions[turnTo] === null || !this.state.safeTile.includes(this.directions[turnTo].index))
       return;
 
@@ -74,15 +60,14 @@ Pac.prototype.checkDirection = function(turnTo) {
    else
    {
       this.turning = turnTo;
+
       this.turnPoint.x = (this.marker.x * TILE_SIZE) + (TILE_SIZE / 2);
       this.turnPoint.y = (this.marker.y * TILE_SIZE) + (TILE_SIZE / 2);
-
-      console.log(this.turnPoint, this.marker);
    }
 }
 
 
-Pac.prototype.turn = function () {
+Enemy.prototype.turn = function () {
 
    var cx = Math.floor(this.x);
    var cy = Math.floor(this.y);
@@ -105,10 +90,8 @@ Pac.prototype.turn = function () {
 
 }
 
-Pac.prototype.move = function(direction) {
+Enemy.prototype.move = function(direction) {
    var speed = this.speed;
-   this.scale.x = 1;
-   this.angle = 0;
 
    if (direction === Phaser.LEFT || direction === Phaser.UP)
       speed = -speed;
@@ -117,15 +100,6 @@ Pac.prototype.move = function(direction) {
       this.body.velocity.x = speed;
    else
       this.body.velocity.y = speed;
-
-   //  Reset the scale and angle (Pacman is facing to the right in the sprite sheet)
-
-   if (direction === Phaser.LEFT)
-      this.scale.x = -1;
-   else if (direction === Phaser.UP)
-      this.angle = 270;
-   else if (direction === Phaser.DOWN)
-      this.angle = 90;
 
    this.current = direction;
 }
