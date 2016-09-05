@@ -1,6 +1,7 @@
 var pacman = function(game) { 
 }
-var aStar;
+
+var enemy;
 
 pacman.prototype = {
 
@@ -33,7 +34,7 @@ pacman.prototype = {
 
       // Setting up SaveCPU
       saveCpu = self.game.plugins.add(Phaser.Plugin.SaveCPU);
-      saveCpu.renderOnFPS = 45;
+      saveCpu.renderOnFPS = 40;
 
       // Setting up ProTracker
       self.proTracker = new Protracker();
@@ -41,16 +42,7 @@ pacman.prototype = {
       //self.proTracker.onStop = function() { self.proTracker.play(); };
 
       //self.proTracker.buffer = self.game.cache.getBinary(MODS[0]);
-      //self.proTracker.parse();
-
-      // Setting up AStar data
-      aStar = self.game.plugins.add(Phaser.Plugin.AStar);
-      aStar.setAStarMap(self.map, 'layer1', 'tileset');
-      aStar._useDiagonal = false;
-
-      var start = self.layer.getTileXY(24,24, {});
-      var goal = self.layer.getTileXY(238,217, {});
-      console.log(aStar.findPath(start, goal));
+      //self.proTracker.parse(); 
 
       self.turnPoint = new Phaser.Point();
       self.marker = new Phaser.Point();
@@ -59,23 +51,19 @@ pacman.prototype = {
 
       self.player = new Pac(this, 24, 24);
 
-      self.enemies = this.add.group(this, null, 'enemies', false, true, Phaser.Physics.ARCADE);
-      self.enemies.add(new Enemy(this, 120, 24));
+      //self.enemies = this.add.group(this, null, 'enemies', false, true, Phaser.Physics.ARCADE);
+      //self.enemies.add(new Enemy(this, 120, 24));
+      enemy = new Enemy(this, 120, 24);
 
       self.cursors = self.input.keyboard.createCursorKeys();
 
       self.dots = this.add.physicsGroup();
-      self.map.createFromTiles([1,2], null, 'dot', self.layer, self.dots);
+      //self.map.createFromTiles([1,2], null, 'dot', self.layer, self.dots);
 
       self.dots.setAll('x', 7, false, false, 1);
       self.dots.setAll('y', 7, false, false, 1);
 
       self.player.move(Phaser.RIGHT);
-      console.log(self.enemies);
-   },
-
-   render: function() {
-      self.game.debug.AStar(self.aStar, 20, 340, '#ff0000');
    },
 
    update: function() {
@@ -83,9 +71,13 @@ pacman.prototype = {
       //Check collisions for everything
       //self.player.body.velocity.setTo(0);
 
-      this.player.checkNearTiles();
+      //this.player.checkNearTiles();
 
       self.text_score.text = self.score;
+   },
+
+   render: function() {
+      enemy.render();
    },
 
    eatDot: function (pacman, dot) {

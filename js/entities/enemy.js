@@ -1,3 +1,4 @@
+var aStar;
 var Enemy = function(state, x, y) {
    Phaser.Sprite.call(this, state.game, x, y, 'enemy');
 
@@ -7,20 +8,28 @@ var Enemy = function(state, x, y) {
 
    this.body.collideWorldBounds = true;
    this.body.immovable = false;
-   this.body.isCircle = true; // MAGIC !!!
    this.anchor.setTo(0.5);
 
    this.speed = 60;
    this.state = state;
    this.turnPoint = new Phaser.Point(x,y);
    this.marker = new Phaser.Point();
-   this.current = Phaser.NONE;
+   this.current = Phaser.RIGHT;
    this.turning = Phaser.NONE;  
 
    this.directions = [ null, null, null, null, null ];
    this.opposites = [ Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, Phaser.DOWN, Phaser.UP ]; 
 
+   this.checkNearTiles();
+
    this.threshold = 3;
+
+   // Setting up AStar data
+   aStar = this.game.plugins.add(Phaser.Plugin.AStar);
+   aStar.setAStarMap(this.state.map, this.state.layer.layer.name, this.state.map.tilesets[0].name);
+   aStar._useDiagonal = false;
+
+   this.path = null;
 
    this.animations.add('move', [0,1],6,true);
    this.animations.play('move');
@@ -29,65 +38,69 @@ var Enemy = function(state, x, y) {
 Enemy.prototype = Object.create(Phaser.Sprite.prototype);
 Enemy.prototype.constructor = Enemy;
 
+Enemy.prototype.render = function() {
+   this.game.debug.AStar(aStar, 20, 340, '#ff0000');
+}
+
 Enemy.prototype.update = function() {
    this.game.physics.arcade.collide(this, this.state.layer);
    this.game.physics.arcade.overlap(this, this.state.player, this.state.playerHit, null, this.state);
 
-   if (this.state.cursors.up.isDown && this.current !== Phaser.UP) {
-      this.checkDirection(Phaser.UP);
-   } else if (this.state.cursors.down.isDown && this.current !== Phaser.DOWN) {
-      this.checkDirection(Phaser.DOWN);
-   } else if (this.state.cursors.left.isDown && this.current !== Phaser.LEFT) {
-      this.checkDirection(Phaser.LEFT);
-   } else if (this.state.cursors.right.isDown && this.current !== Phaser.RIGHT) {
-      this.checkDirection(Phaser.RIGHT);
-   }
-   else {
-      this.turning = Phaser.NONE;
+   var start = this.state.layer.getTileXY(this.x, this.y, {});
+   var tile = this.state.player.directions[this.state.player.current];
+   if (tile !== null || tile !== undefined) {
+      var goal = this.state.layer.getTileXY(tile.worldX, tile.worldY, {});
+      this.path = aStar.findPath(start, goal);
    }
 
-   if (this.turning !== Phaser.NONE) {
-      this.turn();
-   }
+   this.checkPoint(this.path.nodes[this.path.nodes.length-1]);
 }
 
-Enemy.prototype.checkDirection = function(turnTo) {
-   if (this.turning === turnTo || this.directions[turnTo] === null || !this.state.safeTile.includes(this.directions[turnTo].index))
-      return;
+Enemy.prototype.checkNearTiles = function() {
+   this.marker.x = this.state.math.snapToFloor(Math.floor(this.x), TILE_SIZE) / TILE_SIZE;
+   this.marker.y = this.state.math.snapToFloor(Math.floor(this.y), TILE_SIZE) / TILE_SIZE;
 
-   if (this.current === this.opposites[turnTo])
-      this.move(turnTo);
-   else
-   {
-      this.turning = turnTo;
+   var i = this.state.layer.index;
 
-      this.turnPoint.x = (this.marker.x * TILE_SIZE) + (TILE_SIZE / 2);
-      this.turnPoint.y = (this.marker.y * TILE_SIZE) + (TILE_SIZE / 2);
-   }
+   this.directions[Phaser.LEFT] = this.state.map.getTileLeft(i, this.marker.x, this.marker.y);
+   this.directions[Phaser.RIGHT] = this.state.map.getTileRight(i, this.marker.x, this.marker.y);
+   this.directions[Phaser.UP] = this.state.map.getTileAbove(i, this.marker.x, this.marker.y);
+   this.directions[Phaser.DOWN] = this.state.map.getTileBelow(i, this.marker.x, this.marker.y);
+   this.directions[Phaser.NONE] = new Phaser.Point(1,1);
 }
 
+Enemy.prototype.checkPoint = function(nextPoint) {
+   this.checkNearTiles();
+   var direction = this.current;
+   if (nextPoint) {
+      var x = nextPoint.x;
+      var y = nextPoint.y;
+      
 
-Enemy.prototype.turn = function () {
+      if (x < Math.floor(this.x/TILE_SIZE)) {
+         direction = Phaser.LEFT;
+      }
+      else if (x > Math.floor(this.x/TILE_SIZE)) {
+         direction = Phaser.RIGHT;
+      }
+      else if (y < Math.floor(this.y/TILE_SIZE)) {
+         direction = Phaser.UP;
+      }
+      else if (y > Math.floor(this.y/TILE_SIZE)) {
+         direction = Phaser.DOWN;
+      }
+      else {
+         direction = Phaser.NONE;
+      }
+   }
 
-   var cx = Math.floor(this.x);
-   var cy = Math.floor(this.y);
+   if (this.state.math.fuzzyEqual(this.x, this.directions[this.current].worldX + TILE_SIZE/2, this.threshold)
+         && this.state.math.fuzzyEqual(this.y, this.directions[this.current].worldY + TILE_SIZE/2, this.threshold)) {
+      this.x = this.directions[this.current].worldX + TILE_SIZE/2;
+      this.y = this.directions[this.current].worldY + TILE_SIZE/2;
+   }
 
-   //  This needs a threshold, because at high speeds you can't turn because the coordinates skip past
-   if (!this.state.math.fuzzyEqual(cx, this.turnPoint.x, this.threshold) || !this.state.math.fuzzyEqual(cy, this.turnPoint.y, this.threshold))
-      return false;
-
-   //  Grid align before turning
-   this.x = this.turnPoint.x;
-   this.y = this.turnPoint.y;
-
-   this.body.reset(this.x, this.y);
-
-   this.move(this.turning);
-
-   this.turning = Phaser.NONE;
-
-   return true;
-
+   this.move(direction);
 }
 
 Enemy.prototype.move = function(direction) {
@@ -95,11 +108,12 @@ Enemy.prototype.move = function(direction) {
 
    if (direction === Phaser.LEFT || direction === Phaser.UP)
       speed = -speed;
-   
-   if (direction === Phaser.RIGHT || direction === Phaser.LEFT)
-      this.body.velocity.x = speed;
-   else
-      this.body.velocity.y = speed;
 
+   if (direction === Phaser.RIGHT || direction === Phaser.LEFT) {
+      this.body.velocity.x = speed;
+   }
+   else {
+      this.body.velocity.y = speed;
+   }
    this.current = direction;
 }

@@ -20,6 +20,8 @@ var Pac = function(state, x, y) {
    this.directions = [ null, null, null, null, null ];
    this.opposites = [ Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, Phaser.DOWN, Phaser.UP ]; 
 
+   this.checkNearTiles();
+
    this.threshold = 3;
 
    this.animations.add('chomp', [0,1,2,1],   12,true);
@@ -33,6 +35,8 @@ Pac.prototype.update = function() {
    this.game.physics.arcade.collide(this, this.state.layer);
    this.game.physics.arcade.overlap(this, this.state.dots, this.state.eatDot, null, this.state);
    this.game.physics.arcade.overlap(this, this.state.enemies, this.state.playerHit, null, this.state);
+
+   this.checkNearTiles();
 
    if (this.state.cursors.up.isDown && this.current !== Phaser.UP) {
       this.checkDirection(Phaser.UP);
@@ -77,7 +81,6 @@ Pac.prototype.checkDirection = function(turnTo) {
       this.turnPoint.x = (this.marker.x * TILE_SIZE) + (TILE_SIZE / 2);
       this.turnPoint.y = (this.marker.y * TILE_SIZE) + (TILE_SIZE / 2);
 
-      console.log(this.turnPoint, this.marker);
    }
 }
 
