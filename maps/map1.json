@@ -23,11 +23,21 @@
          "imageheight":32,
          "imagewidth":32,
          "margin":0,
-         "name":"tileset merdique",
+         "name":"tileset",
          "spacing":0,
          "tilecount":4,
          "tileheight":16,
-         "tilewidth":16
+         "tilewidth":16,
+         "tileproperties": {
+            "0":
+               {
+                  "walkable":"false"
+               },
+            "1":
+               {
+                  "walkable":"true"
+               }
+         }
         }],
  "tilewidth":16,
  "version":1,

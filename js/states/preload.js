@@ -1,6 +1,6 @@
 //Constants
 var TILE_SIZE = 16;
-var easystar = new EasyStar.js();
+var MODS = []; // mods files
 
 // State
 var preload = function(game) {
@@ -19,7 +19,7 @@ preload.prototype = {
 		this.game.load.spritesheet('player', 'assets/player.png', 16, 16);
 
 		//Music
-		//this.game.load.audio('ambient', ['assets/audio/e1m1.mp3']);
+		//this.game.load.binary('shampoo', 'assets/audio/shampoo.mod', this.modLoaded, this);
 
 		//Sounds
 		//this.game.load.audio('pickup', ['assets/audio/pickup.wav']);
@@ -33,7 +33,11 @@ preload.prototype = {
    },
    create: function() {
       console.log("-*- Preloaded -*-");
-      console.log(easystar);
       this.game.state.start("GameTitle");
+   },
+   modLoaded: function(key, data) {
+      MODS.push(key);
+      var buffer = new Uint8Array(data);
+      return buffer;
    }
 }

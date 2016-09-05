@@ -1,5 +1,6 @@
 var pacman = function(game) { 
 }
+var aStar;
 
 pacman.prototype = {
 
@@ -23,24 +24,33 @@ pacman.prototype = {
       self.text_score.anchor.setTo(0.5);
 
       self.map = self.add.tilemap('map1');
-      self.map.addTilesetImage('tileset merdique', 'tiles');
+      self.map.addTilesetImage('tileset', 'tiles');
       //self.map.addTilesetImage('tiles_WIP', 'tiles');
 
       self.layer = self.map.createLayer('layer1');
       self.layer.resizeWorld();
       self.safeTile = 2;
 
-      //Setting up EasyStar data
-      var grid = [];
-      for (var i = 0 ; i < self.layer.layer.data.length; i++) {
-         grid.push([]);
-         for (var j = 0 ; j < self.layer.layer.data[i].length; j++) {
-            grid[i].push(self.layer.layer.data[i][j].index);
-         }
-      }
-      easystar.setGrid(grid);
-      easystar.setAcceptableTiles([2]);
-      easystar.calculate();
+      // Setting up SaveCPU
+      saveCpu = self.game.plugins.add(Phaser.Plugin.SaveCPU);
+      saveCpu.renderOnFPS = 45;
+
+      // Setting up ProTracker
+      self.proTracker = new Protracker();
+      //self.proTracker.onReady = function() { self.proTracker.play(); };
+      //self.proTracker.onStop = function() { self.proTracker.play(); };
+
+      //self.proTracker.buffer = self.game.cache.getBinary(MODS[0]);
+      //self.proTracker.parse();
+
+      // Setting up AStar data
+      aStar = self.game.plugins.add(Phaser.Plugin.AStar);
+      aStar.setAStarMap(self.map, 'layer1', 'tileset');
+      aStar._useDiagonal = false;
+
+      var start = self.layer.getTileXY(24,24, {});
+      var goal = self.layer.getTileXY(238,217, {});
+      console.log(aStar.findPath(start, goal));
 
       self.turnPoint = new Phaser.Point();
       self.marker = new Phaser.Point();
@@ -61,6 +71,10 @@ pacman.prototype = {
       self.dots.setAll('y', 7, false, false, 1);
 
       self.player.move(Phaser.RIGHT);
+   },
+
+   render: function() {
+      self.game.debug.AStar(self.aStar, 20, 340, '#ff0000');
    },
 
    update: function() {
