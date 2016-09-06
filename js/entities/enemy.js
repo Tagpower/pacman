@@ -1,4 +1,3 @@
-var aStar;
 var Enemy = function(state, x, y) {
    Phaser.Sprite.call(this, state.game, x, y, 'enemy');
 
@@ -25,32 +24,37 @@ var Enemy = function(state, x, y) {
    this.threshold = 3;
 
    // Setting up AStar data
-   aStar = this.game.plugins.add(Phaser.Plugin.AStar);
-   aStar.setAStarMap(this.state.map, this.state.layer.layer.name, this.state.map.tilesets[0].name);
-   aStar._useDiagonal = false;
+   this.aStar = this.game.plugins.add(Phaser.Plugin.AStar);
+   this.aStar.setAStarMap(this.state.map, this.state.layer.layer.name, this.state.map.tilesets[0].name);
+   this.aStar._useDiagonal = false;
 
    this.path = null;
 
    this.animations.add('move', [0,1],6,true);
    this.animations.play('move');
+
+   this.events.onKilled.add(this.cleanPlugins, this);
 }
 
 Enemy.prototype = Object.create(Phaser.Sprite.prototype);
 Enemy.prototype.constructor = Enemy;
 
+Enemy.prototype.cleanPlugins = function(enemy) {
+   this.game.plugins.remove(this.aStar, true);
+}
+
 Enemy.prototype.render = function() {
-   this.game.debug.AStar(aStar, 20, 340, '#ff0000');
+   //this.game.debug.AStar(this.aStar, 20, 340, '#ff0000');
 }
 
 Enemy.prototype.update = function() {
    this.game.physics.arcade.collide(this, this.state.layer);
-   this.game.physics.arcade.overlap(this, this.state.player, this.state.playerHit, null, this.state);
 
    var start = this.state.layer.getTileXY(this.x, this.y, {});
    var tile = this.state.player.directions[this.state.player.current];
    if (tile !== null || tile !== undefined) {
       var goal = this.state.layer.getTileXY(tile.worldX, tile.worldY, {});
-      this.path = aStar.findPath(start, goal);
+      this.path = this.aStar.findPath(start, goal);
    }
 
    this.checkPoint(this.path.nodes[this.path.nodes.length-1]);

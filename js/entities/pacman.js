@@ -16,6 +16,8 @@ var Pac = function(state, x, y) {
    this.marker = new Phaser.Point();
    this.current = Phaser.NONE;
    this.turning = Phaser.NONE;
+   this.alive = true;
+   this.exists = true;
 
    this.directions = [ null, null, null, null, null ];
    this.opposites = [ Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, Phaser.DOWN, Phaser.UP ]; 
@@ -25,6 +27,10 @@ var Pac = function(state, x, y) {
    this.threshold = 3;
 
    this.animations.add('chomp', [0,1,2,1],   12,true);
+   this.deathAnim = this.animations.add('death', [0,3,4,5,6,7,8], 5);
+   this.deathAnim.onComplete.add(this.state.gameOver, this.state);
+   this.deathAnim.killOnComplete = true;
+
    this.animations.play('chomp');
 }
 
@@ -34,7 +40,7 @@ Pac.prototype.constructor = Pac;
 Pac.prototype.update = function() {
    this.game.physics.arcade.collide(this, this.state.layer);
    this.game.physics.arcade.overlap(this, this.state.dots, this.state.eatDot, null, this.state);
-   this.game.physics.arcade.overlap(this, this.state.enemies, this.state.playerHit, null, this.state);
+   this.game.physics.arcade.collide(this, this.state.enemies, this.death, null, this);
 
    this.checkNearTiles();
 
@@ -131,4 +137,11 @@ Pac.prototype.move = function(direction) {
       this.angle = 90;
 
    this.current = direction;
+}
+
+Pac.prototype.death = function(pacman, enemy) {
+   var self = this;
+   enemy.kill();
+   this.body.velocity.setTo(0);
+   this.animations.play('death');
 }

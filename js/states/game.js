@@ -1,14 +1,15 @@
-var pacman = function(game) { 
+var pacman = function() { 
+   Phaser.State.call(this);
 }
 
-var enemy;
+pacman.prototype = Object.create(Phaser.State);
+pacman.prototype.constructor = pacman;
 
 pacman.prototype = {
 
    init: function(config) {
       var self = this;
       console.log("Running the game...");
-      console.log(self.config);
 
       self.current_level = config.current_level;
    },
@@ -32,10 +33,6 @@ pacman.prototype = {
       self.layer.resizeWorld();
       self.safeTile = [1,2];
 
-      // Setting up SaveCPU
-      saveCpu = self.game.plugins.add(Phaser.Plugin.SaveCPU);
-      saveCpu.renderOnFPS = 40;
-
       // Setting up ProTracker
       self.proTracker = new Protracker();
       //self.proTracker.onReady = function() { self.proTracker.play(); };
@@ -51,9 +48,8 @@ pacman.prototype = {
 
       self.player = new Pac(this, 24, 24);
 
-      //self.enemies = this.add.group(this, null, 'enemies', false, true, Phaser.Physics.ARCADE);
-      //self.enemies.add(new Enemy(this, 120, 24));
-      enemy = new Enemy(this, 120, 24);
+      self.enemies = this.add.group(this, null, 'enemies', false, true, Phaser.Physics.ARCADE);
+      self.enemies.add(new Enemy(this, 120, 24));
 
       self.cursors = self.input.keyboard.createCursorKeys();
 
@@ -68,16 +64,11 @@ pacman.prototype = {
 
    update: function() {
       var self = this;
-      //Check collisions for everything
-      //self.player.body.velocity.setTo(0);
-
-      //this.player.checkNearTiles();
-
       self.text_score.text = self.score;
    },
 
    render: function() {
-      enemy.render();
+
    },
 
    eatDot: function (pacman, dot) {
@@ -116,17 +107,9 @@ pacman.prototype = {
       }   
    },
 
-   // When the player is hit by enemy
-   playerHit: function(player, enemy) {
-      var self = this;
-      console.log("qijhfbazekbfkqbf");
-   },
-
-
    gameOver: function() {
       var self = this;
-
-      this.game.state.start("GameOver");
+      this.game.stateTransition.to("GameOver", true, false);
    },
 
    muteGame: function() {
@@ -147,5 +130,8 @@ pacman.prototype = {
    restart: function(level) {
       var self = this;
    },
+   
+   shutdown: function() {
+   }
 }
 

@@ -18,6 +18,24 @@ boot.prototype = {
 
       this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
+      console.log("-*- Load SaveCPU -*-");
+      this.saveCpu = this.game.plugins.add(Phaser.Plugin.SaveCPU);
+      this.saveCpu.renderOnFPS = 50;
+
+      console.log("-*- Load StateTransition -*-");
+      this.game.stateTransition = this.game.plugins.add(Phaser.Plugin.StateTransition);
+      this.game.stateTransition.configure({
+         duration: Phaser.Timer.SECOND * 1.5,
+         ease: Phaser.Easing.Exponential.InOut,
+         properties: {
+            alpha: 0,
+            scale: {
+               x: 0.4,
+               y: 0.4
+            }
+         }
+      });
+
       console.log("-*- Booted -*-");
       this.game.state.start("Preload");
    }
