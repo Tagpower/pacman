@@ -27,6 +27,7 @@ gameTitle.prototype = {
       var self = this;
       var config = {
          is_boss: false,
+         current_level: 0,
       };
       //self.music.stop();
       this.game.state.start("Game", true, false, config);

@@ -39,7 +39,7 @@ Pac.prototype.constructor = Pac;
 
 Pac.prototype.update = function() {
    this.game.physics.arcade.collide(this, this.state.layer);
-   this.game.physics.arcade.overlap(this, this.state.dots, this.state.eatDot, null, this.state);
+   this.game.physics.arcade.overlap(this, this.state.dots, this.eatDot, null, this);
    this.game.physics.arcade.collide(this, this.state.enemies, this.death, null, this);
 
    this.checkNearTiles();
@@ -60,6 +60,11 @@ Pac.prototype.update = function() {
    if (this.turning !== Phaser.NONE) {
       this.turn();
    }
+}
+
+Pac.prototype.eatDot = function (pacman, dot) {
+   dot.kill();
+   this.state.score += 10;
 }
 
 Pac.prototype.checkNearTiles = function() {
@@ -121,7 +126,7 @@ Pac.prototype.move = function(direction) {
 
    if (direction === Phaser.LEFT || direction === Phaser.UP)
       speed = -speed;
-   
+
    if (direction === Phaser.RIGHT || direction === Phaser.LEFT)
       this.body.velocity.x = speed;
    else
