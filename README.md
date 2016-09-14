@@ -6,7 +6,6 @@ Play it <a href=http://tagpower.github.io/pacman/>here</a> !
 <h2>PAC-MAN DU PAUVRE</h2>
 
 Créé par Clément Bauchet en août 2016, chez lui après ~~une énorme cuite~~ certainement une dose <i>obscène</i> de Monster Munch et d'Ice Tea.<br>
-Utilise <a href=https://github.com/prettymuchbryce/easystarjs>EasyStar.js</a>
 
 Commandes :
 	- Gauche / Droite / Haut / Bas : Mouvement

@@ -20,7 +20,7 @@ boot.prototype = {
 
       console.log("-*- Load SaveCPU -*-");
       this.saveCpu = this.game.plugins.add(Phaser.Plugin.SaveCPU);
-      this.saveCpu.renderOnFPS = 50;
+      this.saveCpu.renderOnFPS = 60;
 
       console.log("-*- Load StateTransition -*-");
       this.game.stateTransition = this.game.plugins.add(Phaser.Plugin.StateTransition);

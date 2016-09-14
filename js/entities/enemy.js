@@ -8,8 +8,9 @@ var Enemy = function(state, x, y) {
    this.body.collideWorldBounds = true;
    this.body.immovable = false;
    this.anchor.setTo(0.5);
+   this.body.setCircle(8);
 
-   this.speed = 60;
+   this.speed = 80;
    this.state = state;
    this.turnPoint = new Phaser.Point(x,y);
    this.marker = new Phaser.Point();
