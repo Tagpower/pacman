@@ -7,11 +7,10 @@ var Pac = function(state, x, y) {
 
    this.body.collideWorldBounds = true;
    this.body.immovable = false;
-   //this.body.isCircle =, true; // MAGIC !!!
+   this.body.isCircle = true; // MAGIC !!!
    this.anchor.setTo(0.5);
-   this.body.setCircle(7,1,1);
 
-   this.speed = 100;
+   this.speed = 75;
    this.state = state;
    this.turnPoint = new Phaser.Point(x,y);
    this.marker = new Phaser.Point();
@@ -41,7 +40,7 @@ Pac.prototype.constructor = Pac;
 Pac.prototype.update = function() {
    this.game.physics.arcade.collide(this, this.state.layer);
    this.game.physics.arcade.overlap(this, this.state.dots, this.eatDot, null, this);
-   this.game.physics.arcade.overlap(this, this.state.enemies, this.death, null, this);
+   this.game.physics.arcade.collide(this, this.state.enemies, this.death, null, this);
 
    this.checkNearTiles();
 

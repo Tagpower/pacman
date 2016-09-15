@@ -1,12 +1,10 @@
 ﻿=====TODO LIST=====
 - ABSOLUMENT TOUT
-- Les ennemis et le pathfinding (WIP)
+- Les ennemis et le pathfinding
 
 =====BUGS=====
 
 ---MAJEURS---
-- GODDAMN STATETRANSITION QUI CRASH SANS RAISON
-- Empecher les ennemis d'aller en diagonale
+
 
 ---MINEURS---
-

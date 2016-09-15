@@ -25,6 +25,7 @@ pacman.prototype = {
 
       self.map = self.add.tilemap(self.game.gameMaps[self.current_level]);
       console.log(this.map);
+      //self.map.addTilesetImage('tileset merdique', 'tiles');
       self.map.addTilesetImage('tileset', 'tiles');
 
       self.layer = self.map.createLayer('layer1');
@@ -62,7 +63,7 @@ pacman.prototype = {
       self.dots.setAll('x', 7, false, false, 1);
       self.dots.setAll('y', 7, false, false, 1);
 
-      self.player.move(Phaser.DOWN);
+      self.player.move(Phaser.RIGHT);
       self.READY = true;
    },
 
@@ -84,11 +85,7 @@ pacman.prototype = {
    },
 
    render: function() {
-      var self = this;
-      game.debug.body(self.player);
-      self.enemies.forEach( function(e){
-         game.debug.body(e);
-      }, self);
+
    },
 
    // Load a level and its enemies
