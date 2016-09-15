@@ -38,27 +38,29 @@ Pac.prototype = Object.create(Phaser.Sprite.prototype);
 Pac.prototype.constructor = Pac;
 
 Pac.prototype.update = function() {
-   this.game.physics.arcade.collide(this, this.state.layer);
-   this.game.physics.arcade.overlap(this, this.state.dots, this.eatDot, null, this);
-   this.game.physics.arcade.collide(this, this.state.enemies, this.death, null, this);
+   if (this.alive) {
+      this.game.physics.arcade.collide(this, this.state.layer);
+      this.game.physics.arcade.overlap(this, this.state.dots, this.eatDot, null, this);
+      this.game.physics.arcade.collide(this, this.state.enemies, this.death, null, this);
 
-   this.checkNearTiles();
+      this.checkNearTiles();
 
-   if (this.state.cursors.up.isDown && this.current !== Phaser.UP) {
-      this.checkDirection(Phaser.UP);
-   } else if (this.state.cursors.down.isDown && this.current !== Phaser.DOWN) {
-      this.checkDirection(Phaser.DOWN);
-   } else if (this.state.cursors.left.isDown && this.current !== Phaser.LEFT) {
-      this.checkDirection(Phaser.LEFT);
-   } else if (this.state.cursors.right.isDown && this.current !== Phaser.RIGHT) {
-      this.checkDirection(Phaser.RIGHT);
-   }
-   else {
-      this.turning = Phaser.NONE;
-   }
+      if (this.state.cursors.up.isDown && this.current !== Phaser.UP) {
+         this.checkDirection(Phaser.UP);
+      } else if (this.state.cursors.down.isDown && this.current !== Phaser.DOWN) {
+         this.checkDirection(Phaser.DOWN);
+      } else if (this.state.cursors.left.isDown && this.current !== Phaser.LEFT) {
+         this.checkDirection(Phaser.LEFT);
+      } else if (this.state.cursors.right.isDown && this.current !== Phaser.RIGHT) {
+         this.checkDirection(Phaser.RIGHT);
+      }
+      else {
+         this.turning = Phaser.NONE;
+      }
 
-   if (this.turning !== Phaser.NONE) {
-      this.turn();
+      if (this.turning !== Phaser.NONE) {
+         this.turn();
+      }
    }
 }
 
@@ -147,6 +149,7 @@ Pac.prototype.move = function(direction) {
 Pac.prototype.death = function(pacman, enemy) {
    var self = this;
    enemy.kill();
+   pacman.alive = false;
    this.body.velocity.setTo(0);
    this.animations.play('death');
 }
